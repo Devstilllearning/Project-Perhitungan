@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nusa Penida Trip Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ocean: #0a6e6e;
+    --ocean-light: #0d8f8f;
+    --ocean-pale: #e0f5f5;
+    --sand: #f5ede0;
+    --sand-dark: #e8d5b7;
+    --coral: #e05a38;
+    --coral-light: #f5c4b3;
+    --coral-pale: #fdf0ec;
+    --leaf: #2d6a4f;
+    --leaf-light: #52b788;
+    --leaf-pale: #d8f3dc;
+    --text: #1a1a2e;
+    --text-muted: #5a6a6a;
+    --text-light: #8fa8a8;
+    --white: #ffffff;
+    --surface: #f8fcfc;
+    --border: rgba(10, 110, 110, 0.12);
+    --border-strong: rgba(10, 110, 110, 0.25);
+    --shadow: 0 4px 24px rgba(10, 110, 110, 0.1);
+    --shadow-hover: 0 8px 40px rgba(10, 110, 110, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--ocean);
+    position: relative;
+    overflow: hidden;
+    padding: 60px 24px 80px;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-wave {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 600;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .hero h1 span { color: #7de8d8; }
+  .hero p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+
+  /* SECTIONS */
+  .section {
+    margin-top: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .section:nth-child(1) { animation-delay: 0.1s; }
+  .section:nth-child(2) { animation-delay: 0.2s; }
+  .section:nth-child(3) { animation-delay: 0.3s; }
+  .section:nth-child(4) { animation-delay: 0.4s; }
+  .section:nth-child(5) { animation-delay: 0.5s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .icon-ocean { background: var(--ocean-pale); }
+  .icon-coral { background: var(--coral-pale); }
+  .icon-leaf { background: var(--leaf-pale); }
+  .icon-sand { background: var(--sand); }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .section-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-hover); }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrap input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+  }
+  .input-wrap input::-webkit-outer-spin-button,
+  .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .input-wrap input:focus {
+    outline: none;
+    border-color: var(--ocean);
+    background: white;
+  }
+  .input-suffix {
+    position: absolute;
+    right: 12px;
+    font-size: 12px;
+    color: var(--text-light);
+    pointer-events: none;
+  }
+
+  /* DESTINATION CARDS */
+  .dest-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+  .dest-card:hover {
+    border-color: var(--ocean-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10,110,110,0.12);
+  }
+  .dest-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .dest-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .dest-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .tag-1 { background: var(--ocean-pale); color: var(--ocean); }
+  .tag-2 { background: var(--coral-pale); color: var(--coral); }
+  .dest-sub {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+  }
+  .dest-card input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+    text-align: right;
+  }
+  .dest-card input::-webkit-outer-spin-button,
+  .dest-card input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .dest-card input:focus {
+    outline: none;
+    border-color: var(--ocean);
+    background: white;
+  }
+  .dest-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-align: right;
+  }
+
+  /* DISCOUNT */
+  .discount-card {
+    background: linear-gradient(135deg, #fff9f7 0%, #fff5f0 100%);
+    border: 1.5px solid var(--coral-light);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .disc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .disc-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 600;
+    color: var(--coral);
+    line-height: 1;
+  }
+  .disc-pct span { font-size: 24px; }
+  .disc-info { text-align: right; }
+  .disc-info .di-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .disc-info .di-val { font-size: 16px; font-weight: 500; color: var(--coral); margin-top: 2px; }
+
+  input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--coral-light);
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-bottom: 12px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--coral);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(224,90,56,0.4);
+    transition: transform 0.1s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--coral);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(224,90,56,0.4);
+  }
+
+  .disc-manual {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .disc-manual input {
+    width: 70px;
+    padding: 6px 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--coral-light);
+    border-radius: 8px;
+    background: white;
+    color: var(--coral);
+    font-weight: 500;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .disc-manual input::-webkit-outer-spin-button,
+  .disc-manual input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .disc-manual input:focus { outline: none; border-color: var(--coral); }
+
+  /* SUMMARY METRICS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr 1fr; } }
+
+  .metric-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .metric-card .mc-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .metric-card .mc-val {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .metric-card.mc-total { background: var(--leaf-pale); border-color: rgba(82,183,136,0.3); }
+  .metric-card.mc-total .mc-val { color: var(--leaf); }
+  .metric-card.mc-disc { background: var(--coral-pale); border-color: var(--coral-light); }
+  .metric-card.mc-disc .mc-val { color: var(--coral); }
+  .metric-card.mc-save { background: var(--ocean-pale); border-color: rgba(10,110,110,0.2); }
+  .metric-card.mc-save .mc-val { color: var(--ocean); }
+
+  /* BREAKDOWN TABLE */
+  .breakdown-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .breakdown-head {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--ocean);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+  }
+  .breakdown-head span:not(:first-child),
+  .breakdown-row span:not(:first-child) { text-align: right; min-width: 90px; }
+
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 8px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .breakdown-row:hover { background: var(--surface); }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .br-name { color: var(--text); }
+  .breakdown-row .br-sub { color: var(--text-muted); }
+  .breakdown-row .br-disc { color: var(--coral); }
+  .breakdown-row .br-final { color: var(--leaf); font-weight: 500; }
+
+  .total-banner {
+    background: var(--ocean);
+    border-radius: 0 0 16px 16px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .total-banner .tb-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+  .total-banner .tb-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+  }
+  .total-banner .tb-per {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+    text-align: right;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 13px;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  .footer strong { color: var(--ocean); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .breakdown-head, .breakdown-row { grid-template-columns: 1fr auto auto; }
+    .breakdown-head span:nth-child(3),
+    .breakdown-row span:nth-child(3) { display: none; }
+    .breakdown-head span, .breakdown-row span { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🏝️ Trip Planner</div>
+  <h1>Nusa Penida<br><span>Trip Calculator</span></h1>
+  <p>Hitung biaya perjalananmu dari Bali ke Nusa Penida, lengkap dengan diskon otomatis untuk semua destinasi.</p>
+  <svg class="hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f8fcfc"/>
+  </svg>
+</div>
+
+<div class="container">
+
+  <!-- INFO DASAR -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-ocean">🚢</div>
+      <div>
+        <div class="section-title">Info Dasar Perjalanan</div>
+        <div class="section-sub">Jumlah orang & biaya transportasi</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div class="field">
+          <label>Jumlah orang</label>
+          <div class="input-wrap">
+            <input type="number" id="pax" value="2" min="1" max="100" oninput="calc()">
+            <span class="input-suffix">orang</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Jumlah hari</label>
+          <div class="input-wrap">
+            <input type="number" id="days" value="2" min="1" max="14" oninput="calc()">
+            <span class="input-suffix">hari</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Speedboat PP (per orang)</label>
+          <div class="input-wrap">
+            <input type="number" id="speedboat" value="150000" min="0" step="5000" oninput="calc()">
+            <span class="input-suffix">IDR</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Sewa kendaraan (per hari)</label>
+          <div class="input-wrap">
+            <input type="number" id="vehicle" value="100000" min="0" step="5000" oninput="calc()">
+            <span class="input-suffix">IDR</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Akomodasi (per malam)</label>
+          <div class="input-wrap">
+            <input type="number" id="hotel" value="300000" min="0" step="10000" oninput="calc()">
+            <span class="input-suffix">IDR</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Makan (per orang/hari)</label>
+          <div class="input-wrap">
+            <input type="number" id="food" value="100000" min="0" step="5000" oninput="calc()">
+            <span class="input-suffix">IDR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESTINASI -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-leaf">📍</div>
+      <div>
+        <div class="section-title">Biaya Tiket Destinasi</div>
+        <div class="section-sub">Tiket masuk per orang (bisa diubah)</div>
+      </div>
+    </div>
+    <div class="grid-2" id="dest-grid"></div>
+  </div>
+
+  <!-- DISKON -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-coral">🏷️</div>
+      <div>
+        <div class="section-title">Diskon Customer</div>
+        <div class="section-sub">Geser slider atau ketik manual</div>
+      </div>
+    </div>
+    <div class="discount-card">
+      <div class="disc-top">
+        <div class="disc-pct" id="disc-display">0<span>%</span></div>
+        <div class="disc-info">
+          <div class="di-label">Total hemat</div>
+          <div class="di-val" id="disc-save-val">Rp 0</div>
+        </div>
+      </div>
+      <input type="range" id="disc-slider" min="0" max="80" step="1" value="0" oninput="syncDisc('slider')">
+      <div class="disc-manual">
+        <span>Atau masukkan manual:</span>
+        <input type="number" id="disc-input" value="0" min="0" max="80" step="1" oninput="syncDisc('input')">
+        <span>%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-sand">💰</div>
+      <div>
+        <div class="section-title">Ringkasan Biaya</div>
+        <div class="section-sub">Setelah diskon diterapkan</div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="mc-label">Subtotal</div>
+        <div class="mc-val" id="m-sub">Rp 0</div>
+      </div>
+      <div class="metric-card mc-disc">
+        <div class="mc-label">Diskon</div>
+        <div class="mc-val" id="m-disc">-Rp 0</div>
+      </div>
+      <div class="metric-card mc-total">
+        <div class="mc-label">Total Bayar</div>
+        <div class="mc-val" id="m-total">Rp 0</div>
+      </div>
+      <div class="metric-card mc-save">
+        <div class="mc-label">Per Orang</div>
+        <div class="mc-val" id="m-perpax">Rp 0</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Total Hari</div>
+        <div class="mc-val" id="m-days">2 hari</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Rombongan</div>
+        <div class="mc-val" id="m-pax">2 orang</div>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="breakdown-wrap">
+      <div class="breakdown-head">
+        <span>Item</span>
+        <span>Subtotal</span>
+        <span>Diskon</span>
+        <span>Bayar</span>
+      </div>
+      <div id="breakdown-body"></div>
+      <div class="total-banner">
+        <div>
+          <div class="tb-label">Grand Total</div>
+        </div>
+        <div>
+          <div class="tb-val" id="grand-total">Rp 0</div>
+          <div class="tb-per" id="grand-perpax">Rp 0 / orang</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Dibuat dengan ❤️ untuk <strong>Trip Nusa Penida</strong> — Bali, Indonesia
+</div>
+
+<script>
+const destinations = [
+  { id: 'crystal_bay', name: 'Crystal Bay', day: 1, defaultCost: 15000 },
+  { id: 'kelingking', name: 'Kelingking Beach', day: 1, defaultCost: 25000 },
+  { id: 'angels', name: "Angel's Billabong", day: 1, defaultCost: 20000 },
+  { id: 'broken', name: 'Broken Beach', day: 1, defaultCost: 10000 },
+  { id: 'diamond', name: 'Diamond Beach', day: 2, defaultCost: 45000 },
+  { id: 'manta', name: 'Manta Point Dive', day: 2, defaultCost: 350000 },
+];
+
+function fmt(n) {
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function buildDestGrid() {
+  const grid = document.getElementById('dest-grid');
+  destinations.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'dest-card';
+    el.innerHTML = `
+      <div class="dest-top">
+        <div class="dest-name">${d.name}</div>
+        <div class="dest-tag tag-${d.day}">Hari ${d.day}</div>
+      </div>
+      <div class="dest-sub">Tiket masuk per orang</div>
+      <div class="dest-label">IDR / orang</div>
+      <input type="number" id="cost_${d.id}" value="${d.defaultCost}" min="0" step="1000" oninput="calc()">
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function syncDisc(src) {
+  const slider = document.getElementById('disc-slider');
+  const input = document.getElementById('disc-input');
+  if (src === 'slider') {
+    input.value = slider.value;
+  } else {
+    let v = Math.min(80, Math.max(0, parseFloat(input.value) || 0));
+    input.value = v;
+    slider.value = v;
+  }
+  calc();
+}
+
+function calc() {
+  const pax = parseInt(document.getElementById('pax').value) || 1;
+  const days = parseInt(document.getElementById('days').value) || 1;
+  const speedboat = parseFloat(document.getElementById('speedboat').value) || 0;
+  const vehicle = parseFloat(document.getElementById('vehicle').value) || 0;
+  const hotel = parseFloat(document.getElementById('hotel').value) || 0;
+  const food = parseFloat(document.getElementById('food').value) || 0;
+  const disc = parseFloat(document.getElementById('disc-input').value) || 0;
+
+  document.getElementById('disc-display').innerHTML = Math.round(disc) + '<span>%</span>';
+
+  const items = [];
+  items.push({ name: 'Speedboat PP', sub: speedboat * pax });
+  items.push({ name: `Sewa kendaraan (${days} hari)`, sub: vehicle * days });
+  items.push({ name: `Akomodasi (${days} malam)`, sub: hotel * (days > 1 ? days - 1 : 1) });
+  items.push({ name: `Makan (${pax} org × ${days} hari)`, sub: food * pax * days });
+
+  destinations.forEach(d => {
+    const cost = parseFloat(document.getElementById('cost_' + d.id).value) || 0;
+    if (cost > 0) items.push({ name: d.name, sub: cost * pax });
+  });
+
+  const subtotal = items.reduce((a, b) => a + b.sub, 0);
+  const discAmt = subtotal * (disc / 100);
+  const total = subtotal - discAmt;
+  const perpax = pax > 0 ? total / pax : 0;
+
+  document.getElementById('m-sub').textContent = fmt(subtotal);
+  document.getElementById('m-disc').textContent = '-' + fmt(discAmt);
+  document.getElementById('m-total').textContent = fmt(total);
+  document.getElementById('m-perpax').textContent = fmt(perpax);
+  document.getElementById('m-days').textContent = days + ' hari';
+  document.getElementById('m-pax').textContent = pax + ' orang';
+  document.getElementById('disc-save-val').textContent = fmt(discAmt);
+  document.getElementById('grand-total').textContent = fmt(total);
+  document.getElementById('grand-perpax').textContent = fmt(perpax) + ' / orang';
+
+  const tbody = document.getElementById('breakdown-body');
+  tbody.innerHTML = '';
+  items.forEach(item => {
+    const dAmt = item.sub * (disc / 100);
+    const fin = item.sub - dAmt;
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    row.innerHTML = `
+      <span class="br-name">${item.name}</span>
+      <span class="br-sub">${fmt(item.sub)}</span>
+      <span class="br-disc">${disc > 0 ? '-' + fmt(dAmt) : '—'}</span>
+      <span class="br-final">${fmt(fin)}</span>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+buildDestGrid();
+calc();
+</script>
+</body>
+</html>
