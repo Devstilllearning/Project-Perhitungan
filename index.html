@@ -3,760 +3,929 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nusa Penida Trip Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Nusa Penida Trip Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ocean: #0a6e6e;
-    --ocean-light: #0d8f8f;
-    --ocean-pale: #e0f5f5;
-    --sand: #f5ede0;
-    --sand-dark: #e8d5b7;
-    --coral: #e05a38;
-    --coral-light: #f5c4b3;
-    --coral-pale: #fdf0ec;
-    --leaf: #2d6a4f;
-    --leaf-light: #52b788;
-    --leaf-pale: #d8f3dc;
-    --text: #1a1a2e;
-    --text-muted: #5a6a6a;
-    --text-light: #8fa8a8;
-    --white: #ffffff;
-    --surface: #f8fcfc;
-    --border: rgba(10, 110, 110, 0.12);
-    --border-strong: rgba(10, 110, 110, 0.25);
-    --shadow: 0 4px 24px rgba(10, 110, 110, 0.1);
-    --shadow-hover: 0 8px 40px rgba(10, 110, 110, 0.18);
-  }
+/* ─── VARIABLES ─── */
+:root {
+  --ink: #12110f;
+  --ink-mid: #4a4540;
+  --ink-soft: #8c8680;
+  --ink-faint: #c8c2bb;
+  --paper: #faf8f4;
+  --teal: #1a7f7a;
+  --teal-mid: #2aaba4;
+  --teal-pale: #e0f3f2;
+  --teal-ultra: #f0faf9;
+  --amber: #c97b2a;
+  --amber-pale: #fef3e2;
+  --rose: #c04b4b;
+  --rose-pale: #fdf0f0;
+  --green: #2d7a4f;
+  --green-pale: #eaf5ef;
+  --border: rgba(18,17,15,0.08);
+  --border-mid: rgba(18,17,15,0.14);
+  --sh-sm: 0 2px 8px rgba(18,17,15,0.06);
+  --sh-md: 0 4px 20px rgba(18,17,15,0.10);
+  --r: 14px;
+  --r-sm: 8px;
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Outfit', system-ui, -apple-system, sans-serif;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--paper); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+button { font-family: var(--font-body); }
+input { font-family: var(--font-body); }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--surface);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ─── KEYFRAMES ─── */
+@keyframes riseIn   { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes popIn    { 0%{opacity:0;transform:scale(.85)} 60%{transform:scale(1.05)} 100%{opacity:1;transform:scale(1)} }
+@keyframes cardIn   { from{opacity:0;transform:translateY(14px) scale(.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes cardOut  { from{opacity:1;max-height:800px;margin-bottom:12px} to{opacity:0;max-height:0;margin-bottom:0;padding:0} }
+@keyframes slideDown{ from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes numIn    { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse    { 0%,100%{transform:scale(1)} 40%{transform:scale(1.18)} }
+@keyframes checkIn  { 0%{transform:scale(0) rotate(-15deg)} 60%{transform:scale(1.3) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+@keyframes toastIn  { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+@keyframes toastOut { from{opacity:1;transform:translateX(-50%) translateY(0)} to{opacity:0;transform:translateX(-50%) translateY(12px)} }
+@keyframes dotDrift { to { background-position: 28px 28px; } }
+@keyframes glowBeat { 0%,100%{opacity:.6} 50%{opacity:1} }
 
-  /* HERO */
-  .hero {
-    background: var(--ocean);
-    position: relative;
-    overflow: hidden;
-    padding: 60px 24px 80px;
-    text-align: center;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-  .hero-wave {
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-  }
-  .hero-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.9);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.2);
-    margin-bottom: 20px;
-    animation: fadeUp 0.5s ease both;
-  }
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 6vw, 56px);
-    font-weight: 600;
-    color: white;
-    line-height: 1.1;
-    margin-bottom: 16px;
-    animation: fadeUp 0.6s ease 0.1s both;
-  }
-  .hero h1 span { color: #7de8d8; }
-  .hero p {
-    font-size: 16px;
-    color: rgba(255,255,255,0.75);
-    font-weight: 300;
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.6;
-    animation: fadeUp 0.6s ease 0.2s both;
-  }
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  background: var(--ink);
+  padding: 64px 24px 96px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero-bg    { position:absolute;inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%, #1e3a38, #12110f 70%); }
+.hero-dots  { position:absolute;inset:0; background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px); background-size:28px 28px; animation:dotDrift 22s linear infinite; }
+.hero-glow  { position:absolute;top:-70px;left:50%;transform:translateX(-50%);width:640px;height:320px; background:radial-gradient(ellipse,rgba(26,127,122,.4),transparent 70%); animation:glowBeat 4s ease-in-out infinite; }
+.hero-inner { position:relative;z-index:1; }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+.hero-badge {
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(26,127,122,.2);border:1px solid rgba(42,171,164,.3);
+  color:#7de8e2;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 16px;border-radius:20px;margin-bottom:22px;
+  animation:riseIn .7s cubic-bezier(.16,1,.3,1) both;
+}
+.hero h1 {
+  font-family:var(--font-display);
+  font-size:clamp(36px,7vw,66px);font-weight:700;color:#fff;line-height:1.0;margin-bottom:14px;
+  animation:riseIn .7s cubic-bezier(.16,1,.3,1) .1s both;
+}
+.hero h1 em { color:#7de8e2;font-style:normal; }
+.hero-sub {
+  font-size:15px;color:rgba(255,255,255,.55);font-weight:300;
+  max-width:440px;margin:0 auto;line-height:1.7;
+  animation:riseIn .7s cubic-bezier(.16,1,.3,1) .2s both;
+}
+.hero-wave { position:absolute;bottom:-1px;left:0;right:0;line-height:0; }
 
-  /* LAYOUT */
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 20px 80px;
-  }
+/* ─── LAYOUT ─── */
+.wrap { max-width:960px;margin:0 auto;padding:48px 20px 80px; }
 
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+.section { margin-bottom:44px; animation:riseIn .6s cubic-bezier(.16,1,.3,1) both; }
+.s1{animation-delay:.05s} .s2{animation-delay:.15s} .s3{animation-delay:.25s} .s4{animation-delay:.35s}
 
-  .grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-  @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+.step-hd { display:flex;align-items:center;gap:10px;margin-bottom:18px; }
+.step-num {
+  width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;
+  font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:transform .2s;
+}
+.step-hd:hover .step-num { transform:scale(1.1); }
+.step-title { font-size:17px;font-weight:600;color:var(--ink); }
+.step-sub   { font-size:13px;color:var(--ink-soft);margin-top:2px; }
 
-  /* SECTIONS */
-  .section {
-    margin-top: 40px;
-    animation: fadeUp 0.6s ease both;
-  }
-  .section:nth-child(1) { animation-delay: 0.1s; }
-  .section:nth-child(2) { animation-delay: 0.2s; }
-  .section:nth-child(3) { animation-delay: 0.3s; }
-  .section:nth-child(4) { animation-delay: 0.4s; }
-  .section:nth-child(5) { animation-delay: 0.5s; }
+/* ─── PERSON LIST ─── */
+.person-list { display:flex;flex-direction:column;gap:12px; }
+.person-empty { text-align:center;padding:24px;font-size:14px;color:var(--ink-soft); }
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .section-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  .icon-ocean { background: var(--ocean-pale); }
-  .icon-coral { background: var(--coral-pale); }
-  .icon-leaf { background: var(--leaf-pale); }
-  .icon-sand { background: var(--sand); }
+.p-card {
+  background:#fff;border:1.5px solid var(--border-mid);border-radius:var(--r);
+  box-shadow:var(--sh-sm);overflow:hidden;
+  transition:box-shadow .25s,border-color .25s,transform .2s;
+  animation:cardIn .4s cubic-bezier(.16,1,.3,1) both;
+}
+.p-card:hover { box-shadow:var(--sh-md);transform:translateY(-1px); }
+.p-card.is-open { border-color:var(--teal-mid);box-shadow:0 0 0 3px rgba(42,171,164,.1),var(--sh-sm); }
+.p-card.is-removing { animation:cardOut .35s ease forwards;pointer-events:none;overflow:hidden; }
 
-  .section-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .section-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 1px;
-  }
+/* ─── CARD HEADER ─── */
+.p-header {
+  display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.p-header:hover { background:rgba(26,127,122,.025); }
 
-  /* CARD */
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    transition: box-shadow 0.2s;
-  }
-  .card:hover { box-shadow: var(--shadow-hover); }
+.p-avatar {
+  width:38px;height:38px;border-radius:50%;color:#fff;
+  font-size:16px;font-weight:700;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s;
+}
+.p-card:hover .p-avatar { transform:scale(1.08); }
+.p-avatar.do-pulse { animation:pulse .35s cubic-bezier(.16,1,.3,1); }
+.av0{background:#1a7f7a} .av1{background:#c97b2a} .av2{background:#c04b4b}
+.av3{background:#2d7a4f} .av4{background:#5a4fcf} .av5{background:#8b4c8b}
+.av6{background:#c06040} .av7{background:#4a7a9b} .av8{background:#7a8a2a} .av9{background:#9b4a6a}
 
-  /* FORM ELEMENTS */
-  .field { margin-bottom: 14px; }
-  .field:last-child { margin-bottom: 0; }
-  .field label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-  }
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .input-wrap input {
-    width: 100%;
-    padding: 10px 14px;
-    font-size: 15px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1.5px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    color: var(--text);
-    transition: border-color 0.2s, background 0.2s;
-    -moz-appearance: textfield;
-  }
-  .input-wrap input::-webkit-outer-spin-button,
-  .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .input-wrap input:focus {
-    outline: none;
-    border-color: var(--ocean);
-    background: white;
-  }
-  .input-suffix {
-    position: absolute;
-    right: 12px;
-    font-size: 12px;
-    color: var(--text-light);
-    pointer-events: none;
-  }
+.p-info { flex:1;min-width:0; }
 
-  /* DESTINATION CARDS */
-  .dest-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-    transition: all 0.2s;
-  }
-  .dest-card:hover {
-    border-color: var(--ocean-light);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(10,110,110,0.12);
-  }
-  .dest-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .dest-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  .dest-tag {
-    font-size: 10px;
-    font-weight: 500;
-    padding: 3px 8px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: 8px;
-  }
-  .tag-1 { background: var(--ocean-pale); color: var(--ocean); }
-  .tag-2 { background: var(--coral-pale); color: var(--coral); }
-  .dest-sub {
-    font-size: 11px;
-    color: var(--text-light);
-    margin-bottom: 10px;
-  }
-  .dest-card input {
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1.5px solid var(--border-strong);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text);
-    transition: border-color 0.2s;
-    -moz-appearance: textfield;
-    text-align: right;
-  }
-  .dest-card input::-webkit-outer-spin-button,
-  .dest-card input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .dest-card input:focus {
-    outline: none;
-    border-color: var(--ocean);
-    background: white;
-  }
-  .dest-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-    text-align: right;
-  }
+/* Name display */
+.name-show {
+  display:flex;align-items:center;gap:6px;cursor:text;
+  width:fit-content;
+}
+.name-text {
+  font-size:15px;font-weight:500;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;
+  transition:color .15s;
+}
+.name-show:hover .name-text { color:var(--teal); }
+.name-pencil {
+  opacity:0;color:var(--ink-faint);transition:opacity .15s,transform .15s;
+  flex-shrink:0;
+}
+.name-show:hover .name-pencil { opacity:1;transform:scale(1.1); }
 
-  /* DISCOUNT */
-  .discount-card {
-    background: linear-gradient(135deg, #fff9f7 0%, #fff5f0 100%);
-    border: 1.5px solid var(--coral-light);
-    border-radius: 16px;
-    padding: 20px;
-  }
-  .disc-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .disc-pct {
-    font-family: 'Playfair Display', serif;
-    font-size: 48px;
-    font-weight: 600;
-    color: var(--coral);
-    line-height: 1;
-  }
-  .disc-pct span { font-size: 24px; }
-  .disc-info { text-align: right; }
-  .disc-info .di-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .disc-info .di-val { font-size: 16px; font-weight: 500; color: var(--coral); margin-top: 2px; }
+/* Name edit */
+.name-edit { display:flex;align-items:center;gap:6px;animation:slideDown .18s ease both; }
+.name-field {
+  font-size:15px;font-weight:500;color:var(--ink);width:180px;
+  border:none;border-bottom:2px solid var(--teal-mid);
+  background:transparent;outline:none;padding:2px 0;
+  transition:border-color .15s;
+}
+.name-field:focus { border-color:var(--teal); }
+.name-save {
+  padding:3px 10px;border-radius:6px;border:none;
+  background:var(--teal);color:#fff;font-size:12px;font-weight:500;
+  cursor:pointer;transition:background .15s,transform .1s;flex-shrink:0;
+}
+.name-save:hover { background:var(--teal-mid); }
+.name-save:active { transform:scale(.93); }
 
-  input[type="range"] {
-    width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: var(--coral-light);
-    outline: none;
-    cursor: pointer;
-    -webkit-appearance: none;
-    margin-bottom: 12px;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--coral);
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(224,90,56,0.4);
-    transition: transform 0.1s;
-  }
-  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-  input[type="range"]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--coral);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 8px rgba(224,90,56,0.4);
-  }
+.p-tags { display:flex;gap:5px;margin-top:5px;flex-wrap:wrap; }
+.tag {
+  font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;
+  animation:popIn .25s cubic-bezier(.16,1,.3,1) both;
+}
+.tag-day  { background:var(--teal-pale);color:var(--teal); }
+.tag-spot { background:var(--amber-pale);color:var(--amber); }
+.tag-cost { background:var(--green-pale);color:var(--green); }
 
-  .disc-manual {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .disc-manual input {
-    width: 70px;
-    padding: 6px 10px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    border: 1.5px solid var(--coral-light);
-    border-radius: 8px;
-    background: white;
-    color: var(--coral);
-    font-weight: 500;
-    text-align: center;
-    -moz-appearance: textfield;
-  }
-  .disc-manual input::-webkit-outer-spin-button,
-  .disc-manual input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .disc-manual input:focus { outline: none; border-color: var(--coral); }
+.p-actions { display:flex;align-items:center;gap:8px;flex-shrink:0; }
+.btn-del {
+  width:28px;height:28px;border-radius:50%;border:1px solid var(--border-mid);
+  background:#fff;color:var(--ink-soft);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.btn-del:hover { background:var(--rose-pale);border-color:var(--rose);color:var(--rose);transform:scale(1.1); }
+.btn-del:active { transform:scale(.88); }
+.chevron {
+  width:20px;height:20px;color:var(--ink-faint);
+  transition:transform .3s cubic-bezier(.16,1,.3,1);flex-shrink:0;
+}
+.chevron.up { transform:rotate(180deg); }
 
-  /* SUMMARY METRICS */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr 1fr; } }
+/* ─── ACCORDION ─── */
+.p-body-wrap {
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .4s cubic-bezier(.16,1,.3,1);
+}
+.p-body-wrap.open { max-height:720px; }
+.p-body { padding:0 18px 18px;border-top:1px solid var(--border); }
 
-  .metric-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    text-align: center;
-  }
-  .metric-card .mc-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-  }
-  .metric-card .mc-val {
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .metric-card.mc-total { background: var(--leaf-pale); border-color: rgba(82,183,136,0.3); }
-  .metric-card.mc-total .mc-val { color: var(--leaf); }
-  .metric-card.mc-disc { background: var(--coral-pale); border-color: var(--coral-light); }
-  .metric-card.mc-disc .mc-val { color: var(--coral); }
-  .metric-card.mc-save { background: var(--ocean-pale); border-color: rgba(10,110,110,0.2); }
-  .metric-card.mc-save .mc-val { color: var(--ocean); }
+.row { display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap; }
+.row-col { margin-top:14px; }
+.row-label { font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em; }
 
-  /* BREAKDOWN TABLE */
-  .breakdown-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .breakdown-head {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 8px;
-    padding: 12px 20px;
-    background: var(--ocean);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.8);
-  }
-  .breakdown-head span:not(:first-child),
-  .breakdown-row span:not(:first-child) { text-align: right; min-width: 90px; }
+/* ─── DAY PILLS ─── */
+.day-pills { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px; }
+.day-pill {
+  padding:6px 18px;border-radius:20px;border:1.5px solid var(--border-mid);background:#fff;
+  font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-mid);
+  transition:all .2s cubic-bezier(.16,1,.3,1);
+}
+.day-pill:hover { border-color:var(--teal-mid);color:var(--teal);transform:translateY(-1px);box-shadow:0 3px 8px rgba(26,127,122,.12); }
+.day-pill.on { background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 3px 10px rgba(26,127,122,.3);transform:translateY(-1px); }
+.day-pill:active { transform:scale(.95); }
 
-  .breakdown-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 8px;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-    transition: background 0.15s;
-  }
-  .breakdown-row:hover { background: var(--surface); }
-  .breakdown-row:last-child { border-bottom: none; }
-  .breakdown-row .br-name { color: var(--text); }
-  .breakdown-row .br-sub { color: var(--text-muted); }
-  .breakdown-row .br-disc { color: var(--coral); }
-  .breakdown-row .br-final { color: var(--leaf); font-weight: 500; }
+/* ─── DEST CHECKBOXES ─── */
+.dest-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px; }
+@media(max-width:500px){ .dest-grid{grid-template-columns:1fr} }
 
-  .total-banner {
-    background: var(--ocean);
-    border-radius: 0 0 16px 16px;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .total-banner .tb-label {
-    font-size: 14px;
-    color: rgba(255,255,255,0.8);
-  }
-  .total-banner .tb-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 600;
-    color: white;
-  }
-  .total-banner .tb-per {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    margin-top: 2px;
-    text-align: right;
-  }
+.dest-item {
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1.5px solid var(--border-mid);border-radius:var(--r-sm);
+  cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);user-select:none;
+}
+.dest-item:hover:not(.off) { border-color:var(--teal-mid);background:var(--teal-ultra);transform:translateY(-1px);box-shadow:0 3px 10px rgba(26,127,122,.1); }
+.dest-item.on  { border-color:var(--teal);background:var(--teal-pale); }
+.dest-item.off { opacity:.35;pointer-events:none; }
+.dest-item:active:not(.off) { transform:scale(.97); }
 
-  /* FOOTER */
-  .footer {
-    text-align: center;
-    padding: 40px 20px;
-    font-size: 13px;
-    color: var(--text-light);
-    border-top: 1px solid var(--border);
-    margin-top: 40px;
-  }
-  .footer strong { color: var(--ocean); font-weight: 500; }
+.cbox {
+  width:18px;height:18px;border-radius:5px;border:2px solid var(--ink-faint);
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s cubic-bezier(.16,1,.3,1);
+}
+.dest-item.on .cbox { background:var(--teal);border-color:var(--teal);box-shadow:0 2px 6px rgba(26,127,122,.3); }
+.ctick { color:#fff;font-size:11px;font-weight:700; }
+.dest-item.just-checked { animation:popIn .28s cubic-bezier(.16,1,.3,1); }
 
-  /* RESPONSIVE */
-  @media (max-width: 480px) {
-    .breakdown-head, .breakdown-row { grid-template-columns: 1fr auto auto; }
-    .breakdown-head span:nth-child(3),
-    .breakdown-row span:nth-child(3) { display: none; }
-    .breakdown-head span, .breakdown-row span { min-width: 70px; }
-  }
+.di-name { font-size:13px;font-weight:500;color:var(--ink);margin-bottom:1px; }
+.di-meta { font-size:11px;color:var(--ink-soft); }
+.di-price { font-size:12px;font-weight:600;color:var(--teal);white-space:nowrap; }
+
+/* ─── SHARED COSTS ─── */
+.shared-card { background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh-sm); }
+.shared-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+@media(max-width:500px){ .shared-grid{grid-template-columns:1fr} }
+.field label { display:block;font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px; }
+.field input[type="number"] {
+  width:100%;padding:10px 14px;font-size:14px;color:var(--ink);
+  border:1.5px solid var(--border-mid);border-radius:var(--r-sm);background:var(--paper);
+  transition:border-color .15s,background .15s,box-shadow .15s;
+  -moz-appearance:textfield;
+}
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance:none; }
+.field input[type="number"]:focus { outline:none;border-color:var(--teal-mid);background:#fff;box-shadow:0 0 0 3px rgba(42,171,164,.1); }
+.field-note { font-size:11px;color:var(--ink-soft);margin-top:4px; }
+
+/* ─── DISCOUNT ─── */
+.disc-card {
+  background:linear-gradient(135deg,#fffbf5,#fff7ee);
+  border:1.5px solid rgba(201,123,42,.25);border-radius:var(--r);padding:20px;
+}
+.disc-row { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px; }
+.disc-num {
+  font-family:var(--font-display);font-size:56px;font-weight:700;line-height:1;color:var(--amber);
+  transition:color .2s;
+}
+.disc-num sup { font-size:28px; }
+.disc-info-r { text-align:right; }
+.disc-label { font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em; }
+.disc-save  { font-size:18px;font-weight:600;color:var(--amber);margin-top:2px; }
+
+input[type="range"] {
+  width:100%;height:5px;-webkit-appearance:none;appearance:none;
+  border-radius:3px;background:rgba(201,123,42,.2);cursor:pointer;outline:none;margin-bottom:12px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--amber);
+  cursor:pointer;box-shadow:0 2px 8px rgba(201,123,42,.45);transition:transform .15s,box-shadow .15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.2);box-shadow:0 3px 12px rgba(201,123,42,.6); }
+input[type="range"]::-moz-range-thumb { width:22px;height:22px;border-radius:50%;background:var(--amber);cursor:pointer;border:none; }
+
+.disc-manual { display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-mid); }
+.disc-manual input[type="number"] {
+  width:68px;padding:7px 10px;text-align:center;font-size:14px;font-weight:600;color:var(--amber);
+  border:1.5px solid rgba(201,123,42,.3);border-radius:var(--r-sm);background:#fff;
+  -moz-appearance:textfield;transition:border-color .15s;
+}
+.disc-manual input[type="number"]::-webkit-outer-spin-button,
+.disc-manual input[type="number"]::-webkit-inner-spin-button { -webkit-appearance:none; }
+.disc-manual input[type="number"]:focus { outline:none;border-color:var(--amber); }
+
+/* ─── ADD BTN ─── */
+.btn-add {
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border:2px dashed var(--border-mid);border-radius:var(--r);background:transparent;cursor:pointer;
+  font-size:14px;font-weight:500;color:var(--ink-soft);margin-top:10px;
+  transition:all .2s cubic-bezier(.16,1,.3,1);
+}
+.btn-add:hover { border-color:var(--teal-mid);color:var(--teal);background:var(--teal-ultra);transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,127,122,.1); }
+.btn-add:active { transform:scale(.98); }
+.btn-add-circle {
+  width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;
+  transition:transform .2s;
+}
+.btn-add:hover .btn-add-circle { transform:rotate(90deg); }
+
+/* ─── RESULTS ─── */
+.result-box { background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-md);overflow:hidden; }
+.res-header {
+  background:var(--ink);padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.res-title { font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff; }
+.res-sub   { font-size:12px;color:rgba(255,255,255,.45);margin-top:2px; }
+.res-total-lbl { font-size:11px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;text-align:right; }
+.res-total-num {
+  font-family:var(--font-display);font-size:32px;font-weight:700;color:#7de8e2;
+  line-height:1.1;animation:numIn .3s ease;
+}
+
+.metrics { display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border); }
+@media(max-width:520px){ .metrics{grid-template-columns:1fr 1fr} }
+.m-cell { padding:16px 18px;border-right:1px solid var(--border); }
+.m-cell:last-child { border-right:none; }
+.m-lbl { font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px; }
+.m-val { font-size:17px;font-weight:600;color:var(--ink);animation:numIn .25s ease; }
+.m-val.teal { color:var(--teal); } .m-val.rose { color:var(--rose); } .m-val.amber { color:var(--amber); }
+
+.pp-list { }
+.pp-row {
+  display:grid;grid-template-columns:34px 1fr auto auto auto;
+  align-items:center;gap:10px;padding:13px 20px;
+  border-bottom:1px solid var(--border);transition:background .12s;
+  animation:riseIn .3s ease both;
+}
+.pp-row:hover { background:var(--paper); }
+.pp-row:last-child { border-bottom:none; }
+.pp-av  { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff; }
+.pp-name { font-size:14px;font-weight:500;color:var(--ink); }
+.pp-detail { font-size:11px;color:var(--ink-soft);margin-top:2px; }
+.pp-col { text-align:right;min-width:78px; }
+.pc-lbl { font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em; }
+.pc-val { font-size:14px;font-weight:500;color:var(--ink);margin-top:1px;animation:numIn .2s ease; }
+.pc-val.rose { color:var(--rose); } .pc-val.teal { color:var(--teal);font-weight:600; }
+
+.shared-section { padding:12px 20px 16px;border-top:1px solid var(--border); }
+.ss-title { font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px; }
+.ss-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;
+}
+.ss-row:last-child { border-bottom:none; }
+.ss-lbl { color:var(--ink-mid); }
+.ss-val { font-weight:500;color:var(--ink); }
+.ss-val.teal { color:var(--teal);font-weight:600; }
+
+.grand-bar {
+  background:var(--teal);padding:20px 24px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.gb-lbl { font-size:14px;color:rgba(255,255,255,.75); }
+.gb-sub { font-size:12px;color:rgba(255,255,255,.5);margin-top:2px; }
+.gb-num { font-family:var(--font-display);font-size:36px;font-weight:700;color:#fff;line-height:1;animation:numIn .3s ease; }
+.gb-per { font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;text-align:right; }
+
+.empty-res { text-align:center;padding:48px 20px;color:var(--ink-soft);font-size:14px;line-height:1.7; }
+.empty-icon { font-size:38px;display:block;margin-bottom:12px; }
+
+/* ─── TOAST ─── */
+.toast {
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:var(--ink);color:#fff;font-size:13px;font-weight:500;
+  padding:10px 20px;border-radius:24px;z-index:1000;
+  opacity:0;pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.toast.in  { animation:toastIn  .3s cubic-bezier(.16,1,.3,1) forwards; }
+.toast.out { animation:toastOut .25s ease forwards; }
+
+/* ─── FOOTER ─── */
+.footer { text-align:center;padding:40px 20px 24px;font-size:13px;color:var(--ink-soft); }
+.footer strong { color:var(--teal);font-weight:500; }
 </style>
 </head>
 <body>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-badge">🏝️ Trip Planner</div>
-  <h1>Nusa Penida<br><span>Trip Calculator</span></h1>
-  <p>Hitung biaya perjalananmu dari Bali ke Nusa Penida, lengkap dengan diskon otomatis untuk semua destinasi.</p>
-  <svg class="hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f8fcfc"/>
-  </svg>
+  <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">🏝️ Trip Planner</div>
+    <h1>Nusa Penida<br><em>Trip Planner</em></h1>
+    <p class="hero-sub">Atur rencana perjalanan per orang — pilih destinasi &amp; hari masing-masing, hitung otomatis dengan diskon.</p>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:64px">
+      <path d="M0,40 C240,64 480,16 720,40 C960,64 1200,20 1440,40 L1440,64 L0,64 Z" fill="#faf8f4"/>
+    </svg>
+  </div>
 </div>
 
-<div class="container">
+<div class="wrap">
 
-  <!-- INFO DASAR -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon icon-ocean">🚢</div>
+  <!-- STEP 1 -->
+  <div class="section s1">
+    <div class="step-hd">
+      <div class="step-num">1</div>
       <div>
-        <div class="section-title">Info Dasar Perjalanan</div>
-        <div class="section-sub">Jumlah orang & biaya transportasi</div>
+        <div class="step-title">Tambah Peserta</div>
+        <div class="step-sub">Klik nama untuk mengedit · Pilih hari &amp; destinasi masing-masing</div>
       </div>
     </div>
-    <div class="card">
-      <div class="grid-2">
-        <div class="field">
-          <label>Jumlah orang</label>
-          <div class="input-wrap">
-            <input type="number" id="pax" value="2" min="1" max="100" oninput="calc()">
-            <span class="input-suffix">orang</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Jumlah hari</label>
-          <div class="input-wrap">
-            <input type="number" id="days" value="2" min="1" max="14" oninput="calc()">
-            <span class="input-suffix">hari</span>
-          </div>
-        </div>
+    <div class="person-list" id="plist">
+      <div class="person-empty">Belum ada peserta. Klik tombol di bawah untuk mulai.</div>
+    </div>
+    <button class="btn-add" onclick="addPerson()">
+      <div class="btn-add-circle">+</div>
+      Tambah Peserta
+    </button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section s2">
+    <div class="step-hd">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Biaya Bersama</div>
+        <div class="step-sub">Dibagi rata ke semua peserta</div>
+      </div>
+    </div>
+    <div class="shared-card">
+      <div class="shared-grid">
         <div class="field">
           <label>Speedboat PP (per orang)</label>
-          <div class="input-wrap">
-            <input type="number" id="speedboat" value="150000" min="0" step="5000" oninput="calc()">
-            <span class="input-suffix">IDR</span>
-          </div>
+          <input type="number" id="f-speedboat" value="300000" min="0" step="5000" oninput="calc()">
+          <div class="field-note">Sanur ↔ Nusa Penida PP · kisaran Rp 150k–300k/sekali jalan</div>
         </div>
         <div class="field">
           <label>Sewa kendaraan (per hari)</label>
-          <div class="input-wrap">
-            <input type="number" id="vehicle" value="100000" min="0" step="5000" oninput="calc()">
-            <span class="input-suffix">IDR</span>
-          </div>
+          <input type="number" id="f-vehicle" value="75000" min="0" step="5000" oninput="calc()">
+          <div class="field-note">Scooter: Rp 60k–85k/hari · Nmax: Rp 100k/hari</div>
         </div>
         <div class="field">
-          <label>Akomodasi (per malam)</label>
-          <div class="input-wrap">
-            <input type="number" id="hotel" value="300000" min="0" step="10000" oninput="calc()">
-            <span class="input-suffix">IDR</span>
-          </div>
+          <label>Akomodasi (per orang/malam) &middot; isi 0 jika day trip</label>
+          <input type="number" id="f-hotel" value="250000" min="0" step="10000" oninput="calc()">
+          <div class="field-note">Homestay/bungalow mulai Rp 209k · Mid: Rp 350k–550k · Vila: Rp 550k+</div>
         </div>
         <div class="field">
           <label>Makan (per orang/hari)</label>
-          <div class="input-wrap">
-            <input type="number" id="food" value="100000" min="0" step="5000" oninput="calc()">
-            <span class="input-suffix">IDR</span>
-          </div>
+          <input type="number" id="f-food" value="100000" min="0" step="5000" oninput="calc()">
+          <div class="field-note">Warung: Rp 25k–60k/makan · 3x = ~Rp 100k</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- DESTINASI -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon icon-leaf">📍</div>
+  <!-- STEP 3 -->
+  <div class="section s3">
+    <div class="step-hd">
+      <div class="step-num">3</div>
       <div>
-        <div class="section-title">Biaya Tiket Destinasi</div>
-        <div class="section-sub">Tiket masuk per orang (bisa diubah)</div>
+        <div class="step-title">Diskon Customer</div>
+        <div class="step-sub">Berlaku untuk semua komponen biaya</div>
       </div>
     </div>
-    <div class="grid-2" id="dest-grid"></div>
-  </div>
-
-  <!-- DISKON -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon icon-coral">🏷️</div>
-      <div>
-        <div class="section-title">Diskon Customer</div>
-        <div class="section-sub">Geser slider atau ketik manual</div>
-      </div>
-    </div>
-    <div class="discount-card">
-      <div class="disc-top">
-        <div class="disc-pct" id="disc-display">0<span>%</span></div>
-        <div class="disc-info">
-          <div class="di-label">Total hemat</div>
-          <div class="di-val" id="disc-save-val">Rp 0</div>
+    <div class="disc-card">
+      <div class="disc-row">
+        <div class="disc-num" id="disc-pct">0<sup>%</sup></div>
+        <div class="disc-info-r">
+          <div class="disc-label">Total hemat</div>
+          <div class="disc-save" id="disc-save">Rp 0</div>
         </div>
       </div>
-      <input type="range" id="disc-slider" min="0" max="80" step="1" value="0" oninput="syncDisc('slider')">
+      <input type="range" id="disc-range" min="0" max="80" step="1" value="0" oninput="syncDisc('range')">
       <div class="disc-manual">
-        <span>Atau masukkan manual:</span>
-        <input type="number" id="disc-input" value="0" min="0" max="80" step="1" oninput="syncDisc('input')">
+        <span>Atau ketik:</span>
+        <input type="number" id="disc-num" value="0" min="0" max="80" oninput="syncDisc('num')">
         <span>%</span>
       </div>
     </div>
   </div>
 
-  <!-- SUMMARY -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon icon-sand">💰</div>
+  <!-- STEP 4 -->
+  <div class="section s4">
+    <div class="step-hd">
+      <div class="step-num">4</div>
       <div>
-        <div class="section-title">Ringkasan Biaya</div>
-        <div class="section-sub">Setelah diskon diterapkan</div>
+        <div class="step-title">Ringkasan Biaya</div>
+        <div class="step-sub">Per orang &amp; total keseluruhan</div>
       </div>
     </div>
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="mc-label">Subtotal</div>
-        <div class="mc-val" id="m-sub">Rp 0</div>
-      </div>
-      <div class="metric-card mc-disc">
-        <div class="mc-label">Diskon</div>
-        <div class="mc-val" id="m-disc">-Rp 0</div>
-      </div>
-      <div class="metric-card mc-total">
-        <div class="mc-label">Total Bayar</div>
-        <div class="mc-val" id="m-total">Rp 0</div>
-      </div>
-      <div class="metric-card mc-save">
-        <div class="mc-label">Per Orang</div>
-        <div class="mc-val" id="m-perpax">Rp 0</div>
-      </div>
-      <div class="metric-card">
-        <div class="mc-label">Total Hari</div>
-        <div class="mc-val" id="m-days">2 hari</div>
-      </div>
-      <div class="metric-card">
-        <div class="mc-label">Rombongan</div>
-        <div class="mc-val" id="m-pax">2 orang</div>
-      </div>
-    </div>
-
-    <!-- BREAKDOWN -->
-    <div class="breakdown-wrap">
-      <div class="breakdown-head">
-        <span>Item</span>
-        <span>Subtotal</span>
-        <span>Diskon</span>
-        <span>Bayar</span>
-      </div>
-      <div id="breakdown-body"></div>
-      <div class="total-banner">
-        <div>
-          <div class="tb-label">Grand Total</div>
-        </div>
-        <div>
-          <div class="tb-val" id="grand-total">Rp 0</div>
-          <div class="tb-per" id="grand-perpax">Rp 0 / orang</div>
-        </div>
+    <div class="result-box" id="result-box">
+      <div class="empty-res">
+        <span class="empty-icon">📋</span>
+        Tambahkan peserta dan pilih destinasi<br>untuk melihat rincian biaya
       </div>
     </div>
   </div>
 
 </div>
 
-<div class="footer">
-  Dibuat dengan ❤️ untuk <strong>Trip Nusa Penida</strong> — Bali, Indonesia
-</div>
+<div class="footer">Dibuat untuk <strong>Trip Nusa Penida</strong> — Bali, Indonesia 🌊</div>
+<div class="toast" id="toast"></div>
 
 <script>
-const destinations = [
-  { id: 'crystal_bay', name: 'Crystal Bay', day: 1, defaultCost: 15000 },
-  { id: 'kelingking', name: 'Kelingking Beach', day: 1, defaultCost: 25000 },
-  { id: 'angels', name: "Angel's Billabong", day: 1, defaultCost: 20000 },
-  { id: 'broken', name: 'Broken Beach', day: 1, defaultCost: 10000 },
-  { id: 'diamond', name: 'Diamond Beach', day: 2, defaultCost: 45000 },
-  { id: 'manta', name: 'Manta Point Dive', day: 2, defaultCost: 350000 },
+/* ─── DATA ─── */
+var DESTS = [
+  {id:'crystal',  name:'Crystal Bay',      day:1, cost:10000,  icon:'🤿', sub:'Snorkeling & sunset'},
+  {id:'keling',   name:'Kelingking Beach',  day:1, cost:0,      icon:'🦕', sub:'Gratis · parkir ~Rp 5k'},
+  {id:'angels',   name:"Angel's Billabong", day:1, cost:10000,  icon:'💎', sub:'Natural rock pool'},
+  {id:'broken',   name:'Broken Beach',      day:1, cost:5000,   icon:'🌊', sub:'Natural arch laguna'},
+  {id:'diamond',  name:'Diamond Beach',     day:2, cost:35000,  icon:'💠', sub:'Sudah termasuk parkir'},
+  {id:'manta',    name:'Manta Point Dive',  day:2, cost:350000, icon:'🐠', sub:'Paket snorkeling/diving'},
 ];
+var AV_COLORS = ['av0','av1','av2','av3','av4','av5','av6','av7','av8','av9'];
+var DEFAULT_NAMES = ['Orang A','Orang B','Orang C','Orang D','Orang E','Orang F','Orang G','Orang H'];
+var persons = [];
+var nextId  = 0;
 
+/* ─── TOAST ─── */
+var toastTimer;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  clearTimeout(toastTimer);
+  el.textContent = msg;
+  el.className = 'toast in';
+  toastTimer = setTimeout(function() {
+    el.className = 'toast out';
+  }, 2200);
+}
+
+/* ─── FORMAT ─── */
 function fmt(n) {
   return 'Rp ' + Math.round(n).toLocaleString('id-ID');
 }
+function fmtShort(n) {
+  if (n >= 1000000) return 'Rp ' + (n / 1000000).toFixed(1) + 'jt';
+  if (n >= 1000)    return 'Rp ' + Math.round(n / 1000) + 'k';
+  return 'Rp ' + n;
+}
 
-function buildDestGrid() {
-  const grid = document.getElementById('dest-grid');
-  destinations.forEach(d => {
-    const el = document.createElement('div');
-    el.className = 'dest-card';
-    el.innerHTML = `
-      <div class="dest-top">
-        <div class="dest-name">${d.name}</div>
-        <div class="dest-tag tag-${d.day}">Hari ${d.day}</div>
-      </div>
-      <div class="dest-sub">Tiket masuk per orang</div>
-      <div class="dest-label">IDR / orang</div>
-      <input type="number" id="cost_${d.id}" value="${d.defaultCost}" min="0" step="1000" oninput="calc()">
-    `;
-    grid.appendChild(el);
+/* ─── PERSON MANAGEMENT ─── */
+function addPerson() {
+  var id   = ++nextId;
+  var idx  = persons.length % 10;
+  var name = DEFAULT_NAMES[Math.min(persons.length, DEFAULT_NAMES.length - 1)];
+  persons.push({ id: id, name: name, days: 1, dests: {}, avIdx: idx });
+
+  var list = document.getElementById('plist');
+  var empty = list.querySelector('.person-empty');
+  if (empty) empty.remove();
+
+  var card = document.createElement('div');
+  card.id        = 'pc-' + id;
+  card.className = 'p-card is-open';
+  card.innerHTML = buildCardHTML(id);
+  list.appendChild(card);
+  calc();
+  toast('👤 ' + name + ' ditambahkan');
+}
+
+function removePerson(id) {
+  var p = getPerson(id);
+  if (!p) return;
+  var card = document.getElementById('pc-' + id);
+  if (card) {
+    card.classList.add('is-removing');
+    setTimeout(function() {
+      if (card.parentNode) card.parentNode.removeChild(card);
+      persons = persons.filter(function(x) { return x.id !== id; });
+      if (persons.length === 0) {
+        document.getElementById('plist').innerHTML = '<div class="person-empty">Belum ada peserta. Klik tombol di bawah untuk mulai.</div>';
+      }
+      calc();
+    }, 360);
+  }
+}
+
+function getPerson(id) {
+  for (var i = 0; i < persons.length; i++) {
+    if (persons[i].id === id) return persons[i];
+  }
+  return null;
+}
+
+/* ─── TOGGLE ACCORDION ─── */
+function toggleCard(id) {
+  var p    = getPerson(id);
+  var card = document.getElementById('pc-' + id);
+  var body = document.getElementById('pb-' + id);
+  var chev = document.getElementById('chev-' + id);
+  if (!p || !card || !body || !chev) return;
+  p.open = !p.open;
+  body.classList.toggle('open', p.open);
+  chev.classList.toggle('up', p.open);
+  card.classList.toggle('is-open', p.open);
+}
+
+/* ─── NAME EDITING ─── */
+function startEdit(id) {
+  var p = getPerson(id);
+  if (!p) return;
+  var wrap = document.getElementById('nw-' + id);
+  if (!wrap) return;
+  wrap.innerHTML =
+    '<div class="name-edit">' +
+      '<input class="name-field" id="nf-' + id + '" value="' + escHtml(p.name) + '" maxlength="24" autocomplete="off" ' +
+        'onkeydown="nameKey(event,' + id + ')" onblur="nameBlur(' + id + ')">' +
+      '<button class="name-save" onmousedown="nameSave(' + id + ')">✓ Simpan</button>' +
+    '</div>';
+  var f = document.getElementById('nf-' + id);
+  if (f) { f.focus(); f.select(); }
+}
+
+function nameKey(e, id) {
+  if (e.key === 'Enter')  { e.preventDefault(); applyName(id); }
+  if (e.key === 'Escape') { cancelEdit(id); }
+}
+function nameBlur(id) {
+  setTimeout(function() { applyName(id); }, 120);
+}
+function nameSave(id) {
+  setTimeout(function() { applyName(id); }, 30);
+}
+
+function applyName(id) {
+  var f = document.getElementById('nf-' + id);
+  if (!f) return;
+  var p = getPerson(id);
+  if (!p) return;
+  var val = f.value.trim() || p.name;
+  p.name = val;
+  refreshNameArea(id);
+  refreshAvatar(id);
+  updateTags(id);
+  calc();
+  toast('✏️ Nama diperbarui: ' + val);
+}
+
+function cancelEdit(id) {
+  var p = getPerson(id);
+  if (p) refreshNameArea(id);
+}
+
+function refreshNameArea(id) {
+  var p    = getPerson(id);
+  var wrap = document.getElementById('nw-' + id);
+  if (!p || !wrap) return;
+  wrap.innerHTML =
+    '<div class="name-show" onclick="event.stopPropagation();startEdit(' + id + ')">' +
+      '<span class="name-text">' + escHtml(p.name) + '</span>' +
+      '<svg class="name-pencil" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>' +
+        '<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
+      '</svg>' +
+    '</div>';
+}
+
+function refreshAvatar(id) {
+  var p  = getPerson(id);
+  var av = document.getElementById('av-' + id);
+  if (!p || !av) return;
+  av.textContent = p.name.charAt(0).toUpperCase();
+  av.classList.remove('do-pulse');
+  void av.offsetWidth;
+  av.classList.add('do-pulse');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── DAY SELECTION ─── */
+function setDays(id, d) {
+  var p = getPerson(id);
+  if (!p) return;
+  p.days = d;
+  DESTS.forEach(function(dest) {
+    if (dest.day > d) p.dests[dest.id] = false;
   });
+  var pillsEl = document.getElementById('pills-' + id);
+  if (pillsEl) pillsEl.innerHTML = buildPillsHTML(id);
+  var destEl = document.getElementById('dg-' + id);
+  if (destEl) destEl.innerHTML = buildDestsHTML(id);
+  updateTags(id);
+  calc();
+}
+
+/* ─── DESTINATION TOGGLE ─── */
+function toggleDest(id, destId) {
+  var p = getPerson(id);
+  if (!p) return;
+  p.dests[destId] = !p.dests[destId];
+  var el = document.getElementById('di-' + id + '-' + destId);
+  if (el) {
+    el.classList.toggle('on', !!p.dests[destId]);
+    el.classList.remove('just-checked');
+    if (p.dests[destId]) {
+      void el.offsetWidth;
+      el.classList.add('just-checked');
+    }
+    var tick = el.querySelector('.ctick');
+    if (tick) tick.textContent = p.dests[destId] ? '✓' : '';
+    var cbox = el.querySelector('.cbox');
+    if (cbox) {
+      cbox.style.background    = p.dests[destId] ? '' : '';
+      cbox.style.borderColor   = p.dests[destId] ? '' : '';
+    }
+  }
+  updateTags(id);
+  calc();
+}
+
+/* ─── TAG UPDATE ─── */
+function updateTags(id) {
+  var el = document.getElementById('tags-' + id);
+  var p  = getPerson(id);
+  if (!el || !p) return;
+  el.innerHTML = buildTagsHTML(p);
+}
+
+function buildTagsHTML(p) {
+  var spots = DESTS.filter(function(d) { return p.dests[d.id]; }).length;
+  var disc  = parseFloat(document.getElementById('disc-num').value) || 0;
+  var cost  = calcPersonCost(p);
+  var fin   = Math.round(cost * (1 - disc / 100));
+  return '<span class="tag tag-day">' + p.days + ' hari</span>' +
+         '<span class="tag tag-spot">' + spots + ' spot</span>' +
+         '<span class="tag tag-cost">' + fmtShort(fin) + '</span>';
+}
+
+/* ─── BUILD HTML HELPERS ─── */
+function buildPillsHTML(id) {
+  var p = getPerson(id);
+  return [1, 2].map(function(d) {
+    return '<div class="day-pill' + (p.days === d ? ' on' : '') + '" onclick="setDays(' + id + ',' + d + ')">' + d + ' Hari</div>';
+  }).join('');
+}
+
+function buildDestsHTML(id) {
+  var p = getPerson(id);
+  return DESTS.map(function(dest) {
+    var checked  = !!p.dests[dest.id];
+    var disabled = dest.day > p.days;
+    return '<div id="di-' + id + '-' + dest.id + '" class="dest-item' + (checked ? ' on' : '') + (disabled ? ' off' : '') + '" onclick="toggleDest(' + id + ',\'' + dest.id + '\')">' +
+      '<div class="cbox"><span class="ctick">' + (checked ? '✓' : '') + '</span></div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="di-name">' + dest.icon + ' ' + dest.name + '</div>' +
+        '<div class="di-meta">' + dest.sub + ' · Hari ' + dest.day + '</div>' +
+      '</div>' +
+      '<div class="di-price">' + fmtShort(dest.cost) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function buildCardHTML(id) {
+  var p = getPerson(id);
+  if (!p) return '';
+  return '<div class="p-header" onclick="toggleCard(' + id + ')">' +
+      '<div class="p-avatar ' + AV_COLORS[p.avIdx] + ' do-pulse" id="av-' + id + '">' + p.name.charAt(0).toUpperCase() + '</div>' +
+      '<div class="p-info">' +
+        '<div id="nw-' + id + '">' +
+          '<div class="name-show" onclick="event.stopPropagation();startEdit(' + id + ')">' +
+            '<span class="name-text">' + escHtml(p.name) + '</span>' +
+            '<svg class="name-pencil" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>' +
+              '<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
+            '</svg>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p-tags" id="tags-' + id + '">' + buildTagsHTML(p) + '</div>' +
+      '</div>' +
+      '<div class="p-actions">' +
+        '<button class="btn-del" onclick="event.stopPropagation();removePerson(' + id + ')" title="Hapus peserta">✕</button>' +
+        '<svg id="chev-' + id + '" class="chevron up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+    '</div>' +
+    '<div class="p-body-wrap open" id="pb-' + id + '">' +
+      '<div class="p-body">' +
+        '<div class="row-col">' +
+          '<div class="row-label">Lama Trip</div>' +
+          '<div class="day-pills" id="pills-' + id + '">' + buildPillsHTML(id) + '</div>' +
+        '</div>' +
+        '<div class="row-col">' +
+          '<div class="row-label">Pilih Destinasi</div>' +
+          '<div class="dest-grid" id="dg-' + id + '">' + buildDestsHTML(id) + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ─── CALC ─── */
+function getField(id) {
+  return parseFloat(document.getElementById(id).value) || 0;
+}
+
+function calcPersonCost(p) {
+  var sb   = getField('f-speedboat');
+  var veh  = getField('f-vehicle');
+  var hot  = getField('f-hotel');
+  var food = getField('f-food');
+  var n    = persons.length || 1;
+  var cost = 0;
+  cost += sb;
+  cost += (veh * p.days) / n;
+  cost += hot * (p.days > 1 ? p.days - 1 : 0);
+  cost += food * p.days;
+  DESTS.forEach(function(d) {
+    if (p.dests[d.id]) cost += d.cost;
+  });
+  return cost;
 }
 
 function syncDisc(src) {
-  const slider = document.getElementById('disc-slider');
-  const input = document.getElementById('disc-input');
-  if (src === 'slider') {
-    input.value = slider.value;
+  var r = document.getElementById('disc-range');
+  var n = document.getElementById('disc-num');
+  if (src === 'range') {
+    n.value = r.value;
   } else {
-    let v = Math.min(80, Math.max(0, parseFloat(input.value) || 0));
-    input.value = v;
-    slider.value = v;
+    var v = Math.min(80, Math.max(0, parseFloat(n.value) || 0));
+    n.value = v;
+    r.value = v;
   }
   calc();
 }
 
 function calc() {
-  const pax = parseInt(document.getElementById('pax').value) || 1;
-  const days = parseInt(document.getElementById('days').value) || 1;
-  const speedboat = parseFloat(document.getElementById('speedboat').value) || 0;
-  const vehicle = parseFloat(document.getElementById('vehicle').value) || 0;
-  const hotel = parseFloat(document.getElementById('hotel').value) || 0;
-  const food = parseFloat(document.getElementById('food').value) || 0;
-  const disc = parseFloat(document.getElementById('disc-input').value) || 0;
+  var disc = parseFloat(document.getElementById('disc-num').value) || 0;
+  document.getElementById('disc-pct').innerHTML = Math.round(disc) + '<sup>%</sup>';
+  persons.forEach(function(p) { updateTags(p.id); });
 
-  document.getElementById('disc-display').innerHTML = Math.round(disc) + '<span>%</span>';
+  var rb = document.getElementById('result-box');
 
-  const items = [];
-  items.push({ name: 'Speedboat PP', sub: speedboat * pax });
-  items.push({ name: `Sewa kendaraan (${days} hari)`, sub: vehicle * days });
-  items.push({ name: `Akomodasi (${days} malam)`, sub: hotel * (days > 1 ? days - 1 : 1) });
-  items.push({ name: `Makan (${pax} org × ${days} hari)`, sub: food * pax * days });
+  if (persons.length === 0) {
+    rb.innerHTML = '<div class="empty-res"><span class="empty-icon">📋</span>Tambahkan peserta dan pilih destinasi<br>untuk melihat rincian biaya</div>';
+    document.getElementById('disc-save').textContent = 'Rp 0';
+    return;
+  }
 
-  destinations.forEach(d => {
-    const cost = parseFloat(document.getElementById('cost_' + d.id).value) || 0;
-    if (cost > 0) items.push({ name: d.name, sub: cost * pax });
+  var pData = persons.map(function(p) {
+    var sub  = calcPersonCost(p);
+    var da   = sub * (disc / 100);
+    var fin  = sub - da;
+    var spots = DESTS.filter(function(d) { return p.dests[d.id]; }).length;
+    var dnames = DESTS.filter(function(d) { return p.dests[d.id]; }).map(function(d) { return d.name; }).join(', ') || 'Belum pilih destinasi';
+    return { p:p, sub:sub, da:da, fin:fin, spots:spots, dnames:dnames };
   });
 
-  const subtotal = items.reduce((a, b) => a + b.sub, 0);
-  const discAmt = subtotal * (disc / 100);
-  const total = subtotal - discAmt;
-  const perpax = pax > 0 ? total / pax : 0;
+  var totalSub  = pData.reduce(function(a, x) { return a + x.sub; }, 0);
+  var totalDisc = totalSub * (disc / 100);
+  var grand     = totalSub - totalDisc;
+  var avg       = grand / persons.length;
+  var maxDays   = Math.max.apply(null, persons.map(function(p) { return p.days; }));
+  var n         = persons.length;
 
-  document.getElementById('m-sub').textContent = fmt(subtotal);
-  document.getElementById('m-disc').textContent = '-' + fmt(discAmt);
-  document.getElementById('m-total').textContent = fmt(total);
-  document.getElementById('m-perpax').textContent = fmt(perpax);
-  document.getElementById('m-days').textContent = days + ' hari';
-  document.getElementById('m-pax').textContent = pax + ' orang';
-  document.getElementById('disc-save-val').textContent = fmt(discAmt);
-  document.getElementById('grand-total').textContent = fmt(total);
-  document.getElementById('grand-perpax').textContent = fmt(perpax) + ' / orang';
+  document.getElementById('disc-save').textContent = fmt(totalDisc);
 
-  const tbody = document.getElementById('breakdown-body');
-  tbody.innerHTML = '';
-  items.forEach(item => {
-    const dAmt = item.sub * (disc / 100);
-    const fin = item.sub - dAmt;
-    const row = document.createElement('div');
-    row.className = 'breakdown-row';
-    row.innerHTML = `
-      <span class="br-name">${item.name}</span>
-      <span class="br-sub">${fmt(item.sub)}</span>
-      <span class="br-disc">${disc > 0 ? '-' + fmt(dAmt) : '—'}</span>
-      <span class="br-final">${fmt(fin)}</span>
-    `;
-    tbody.appendChild(row);
-  });
+  var sb   = getField('f-speedboat');
+  var veh  = getField('f-vehicle');
+  var hot  = getField('f-hotel');
+  var food = getField('f-food');
+
+  var shared = [
+    { l: 'Speedboat PP × ' + n + ' orang',         v: sb * n },
+    { l: 'Sewa kendaraan (' + maxDays + ' hari)',   v: veh * maxDays },
+  ];
+  if (hot > 0)  shared.push({ l: 'Akomodasi (' + (maxDays > 1 ? maxDays - 1 : 0) + ' malam × ' + n + ' org)', v: hot * (maxDays > 1 ? maxDays - 1 : 0) * n });
+  if (food > 0) shared.push({ l: 'Estimasi makan (' + n + ' org × ' + maxDays + ' hari)',                       v: food * n * maxDays });
+  var sharedSub = shared.reduce(function(a, x) { return a + x.v; }, 0);
+
+  var ppRows = pData.map(function(d, i) {
+    return '<div class="pp-row" style="animation-delay:' + (i * 0.05) + 's">' +
+      '<div class="pp-av ' + AV_COLORS[d.p.avIdx] + '">' + d.p.name.charAt(0).toUpperCase() + '</div>' +
+      '<div><div class="pp-name">' + escHtml(d.p.name) + '</div><div class="pp-detail">' + d.p.days + ' hari · ' + d.spots + ' spot' + (d.spots > 0 ? ' · ' + d.dnames : '') + '</div></div>' +
+      '<div class="pp-col"><div class="pc-lbl">Subtotal</div><div class="pc-val">' + fmt(d.sub) + '</div></div>' +
+      '<div class="pp-col"><div class="pc-lbl">Diskon</div><div class="pc-val rose">' + (disc > 0 ? '-' + fmt(d.da) : '—') + '</div></div>' +
+      '<div class="pp-col"><div class="pc-lbl">Bayar</div><div class="pc-val teal">' + fmt(d.fin) + '</div></div>' +
+    '</div>';
+  }).join('');
+
+  var sharedRows = shared.map(function(x) {
+    return '<div class="ss-row"><span class="ss-lbl">' + x.l + '</span><span class="ss-val">' + fmt(x.v) + '</span></div>';
+  }).join('');
+
+  rb.innerHTML =
+    '<div class="res-header">' +
+      '<div><div class="res-title">Rincian Biaya Trip</div><div class="res-sub">' + n + ' peserta · diskon ' + Math.round(disc) + '%</div></div>' +
+      '<div><div class="res-total-lbl">Grand Total</div><div class="res-total-num">' + fmt(grand) + '</div></div>' +
+    '</div>' +
+    '<div class="metrics">' +
+      '<div class="m-cell"><div class="m-lbl">Subtotal</div><div class="m-val">' + fmt(totalSub) + '</div></div>' +
+      '<div class="m-cell"><div class="m-lbl">Total Diskon</div><div class="m-val rose">' + (disc > 0 ? '-' + fmt(totalDisc) : '—') + '</div></div>' +
+      '<div class="m-cell"><div class="m-lbl">Total Bayar</div><div class="m-val teal">' + fmt(grand) + '</div></div>' +
+      '<div class="m-cell"><div class="m-lbl">Rata-rata/Orang</div><div class="m-val amber">' + fmt(avg) + '</div></div>' +
+    '</div>' +
+    '<div class="pp-list">' + ppRows + '</div>' +
+    '<div class="shared-section">' +
+      '<div class="ss-title">Komponen Biaya Bersama</div>' +
+      sharedRows +
+      '<div class="ss-row" style="border-top:1px solid var(--border-mid);padding-top:8px;margin-top:4px;border-bottom:none">' +
+        '<span class="ss-lbl" style="font-weight:600">Subtotal bersama</span>' +
+        '<span class="ss-val teal">' + fmt(sharedSub) + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="grand-bar">' +
+      '<div><div class="gb-lbl">Grand Total Semua Peserta</div><div class="gb-sub">' + n + ' orang · ' + Math.round(disc) + '% diskon</div></div>' +
+      '<div><div class="gb-num">' + fmt(grand) + '</div><div class="gb-per">' + fmt(avg) + ' / orang (rata-rata)</div></div>' +
+    '</div>';
 }
 
-buildDestGrid();
-calc();
+/* ─── INIT ─── */
+persons = [];
+nextId  = 0;
+addPerson();
+addPerson();
 </script>
 </body>
 </html>
